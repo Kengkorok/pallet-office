@@ -1,0 +1,17 @@
+# Pallet Office for the CasaOS box. Published on localhost (for hook.sh) and on the
+# Tailscale IP only, so it is reachable from the tailnet but not the LAN/internet.
+# Put TAILSCALE_IP (from `tailscale ip -4`) in .env next to this file.
+services:
+  pallet-office:
+    build: .
+    image: pallet-office:local
+    container_name: pallet-office
+    restart: unless-stopped
+    environment:
+      PALLET_TOKEN: ${PALLET_TOKEN:-}
+    ports:
+      - "127.0.0.1:4400:4400"
+      - "${TAILSCALE_IP:?set TAILSCALE_IP in .env}:4400:4400"
+    volumes:
+      - ./config.json:/app/config.json:ro
+      - ./recordings:/app/recordings

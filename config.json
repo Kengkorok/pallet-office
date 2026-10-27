@@ -1,0 +1,25 @@
+{
+  "projects": [
+    { "name": "Portfolio", "match": ["Kengkorok.github.io"], "dex": 149, "pokemon": "Dragonite" },
+    { "name": "Masjid MTU", "match": ["masjidMTU", "mtu-4.3c"], "dex": 334, "pokemon": "Altaria" },
+    { "name": "PoGo Wave Radar", "match": ["pogo-wave-radar"], "dex": 81, "pokemon": "Magnemite" },
+    { "name": "Pallet Office", "match": ["pallet-office"], "dex": 132, "pokemon": "Ditto" },
+    { "name": "Home", "exact": ["/home/safibnrahman"], "dex": 143, "pokemon": "Snorlax" }
+  ],
+  "fallback": [
+    { "dex": 133, "pokemon": "Eevee" },
+    { "dex": 7, "pokemon": "Squirtle" },
+    { "dex": 1, "pokemon": "Bulbasaur" },
+    { "dex": 4, "pokemon": "Charmander" },
+    { "dex": 175, "pokemon": "Togepi" },
+    { "dex": 393, "pokemon": "Piplup" }
+  ],
+  "helpers": [
+    { "dex": 16, "pokemon": "Pidgey" },
+    { "dex": 19, "pokemon": "Rattata" },
+    { "dex": 10, "pokemon": "Caterpie" },
+    { "dex": 129, "pokemon": "Magikarp" },
+    { "dex": 415, "pokemon": "Combee" },
+    { "dex": 403, "pokemon": "Shinx" }
+  ]
+}
