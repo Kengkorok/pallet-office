@@ -1,15 +1,15 @@
 {
   "hooks": {
-    "SessionStart": [{ "hooks": [{ "type": "command", "command": "/home/safibnrahman/pallet-office/hook.sh", "timeout": 3 }] }],
-    "UserPromptSubmit": [{ "hooks": [{ "type": "command", "command": "/home/safibnrahman/pallet-office/hook.sh", "timeout": 3 }] }],
-    "PreToolUse": [{ "matcher": "*", "hooks": [{ "type": "command", "command": "/home/safibnrahman/pallet-office/hook.sh", "timeout": 3 }] }],
-    "PostToolUse": [{ "matcher": "*", "hooks": [{ "type": "command", "command": "/home/safibnrahman/pallet-office/hook.sh", "timeout": 3 }] }],
-    "PostToolUseFailure": [{ "matcher": "*", "hooks": [{ "type": "command", "command": "/home/safibnrahman/pallet-office/hook.sh", "timeout": 3 }] }],
-    "PermissionRequest": [{ "matcher": "*", "hooks": [{ "type": "command", "command": "/home/safibnrahman/pallet-office/hook.sh", "timeout": 3 }] }],
-    "Notification": [{ "hooks": [{ "type": "command", "command": "/home/safibnrahman/pallet-office/hook.sh", "timeout": 3 }] }],
-    "Stop": [{ "hooks": [{ "type": "command", "command": "/home/safibnrahman/pallet-office/hook.sh", "timeout": 3 }] }],
-    "SubagentStart": [{ "hooks": [{ "type": "command", "command": "/home/safibnrahman/pallet-office/hook.sh", "timeout": 3 }] }],
-    "SubagentStop": [{ "hooks": [{ "type": "command", "command": "/home/safibnrahman/pallet-office/hook.sh", "timeout": 3 }] }],
-    "SessionEnd": [{ "hooks": [{ "type": "command", "command": "/home/safibnrahman/pallet-office/hook.sh", "timeout": 3 }] }]
+    "SessionStart": [{ "hooks": [{ "type": "command", "command": "$HOME/pallet-office/hook.sh", "timeout": 3 }] }],
+    "UserPromptSubmit": [{ "hooks": [{ "type": "command", "command": "$HOME/pallet-office/hook.sh", "timeout": 3 }] }],
+    "PreToolUse": [{ "matcher": "*", "hooks": [{ "type": "command", "command": "$HOME/pallet-office/hook.sh", "timeout": 3 }] }],
+    "PostToolUse": [{ "matcher": "*", "hooks": [{ "type": "command", "command": "$HOME/pallet-office/hook.sh", "timeout": 3 }] }],
+    "PostToolUseFailure": [{ "matcher": "*", "hooks": [{ "type": "command", "command": "$HOME/pallet-office/hook.sh", "timeout": 3 }] }],
+    "PermissionRequest": [{ "matcher": "*", "hooks": [{ "type": "command", "command": "$HOME/pallet-office/hook.sh", "timeout": 3 }] }],
+    "Notification": [{ "hooks": [{ "type": "command", "command": "$HOME/pallet-office/hook.sh", "timeout": 3 }] }],
+    "Stop": [{ "hooks": [{ "type": "command", "command": "$HOME/pallet-office/hook.sh", "timeout": 3 }] }],
+    "SubagentStart": [{ "hooks": [{ "type": "command", "command": "$HOME/pallet-office/hook.sh", "timeout": 3 }] }],
+    "SubagentStop": [{ "hooks": [{ "type": "command", "command": "$HOME/pallet-office/hook.sh", "timeout": 3 }] }],
+    "SessionEnd": [{ "hooks": [{ "type": "command", "command": "$HOME/pallet-office/hook.sh", "timeout": 3 }] }]
   }
 }

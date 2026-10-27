@@ -1,18 +1,112 @@
 # Pallet Office
 
-Ofis pixel untuk session Claude Code. Setiap session muncul sebagai Pokémon: masuk ikut pintu, duduk di meja masa kerja (baca, edit, run, web), pergi **Pusat Pokémon** bila perlukan kau, lepak di **Sudut Chill** bila siap, dan keluar bila session tamat. Subagent masuk sebagai helper kecil sebelah meja tuan dia.
+Ofis pixel untuk session Claude Code. Setiap session muncul sebagai Pokémon: masuk ikut pintu, duduk di meja masa bekerja (baca, edit, run, web), pergi ke **Pusat Pokémon** bila perlukan kau, lepak di **Sudut Chill** bila siap, dan keluar bila session tamat. Subagent masuk sebagai helper kecil di sebelah meja tuannya.
 
-Kod ditulis sendiri dari kosong. Tiada aset Nintendo dalam repo: sprite dimuat masa runtime dari [PokeAPI/sprites](https://github.com/PokeAPI/sprites).
+**Demo:** https://kengkorok.github.io/pallet-office/ (replay hari kerja olok-olok, bukan data sebenar)
 
-## Macam mana jalan
+Server Node tanpa dependency dan frontend HTML biasa. Tiada aset Nintendo dalam repo; sprite dimuat masa runtime dari [PokeAPI/sprites](https://github.com/PokeAPI/sprites).
+
+## Mula cepat (5 minit)
+
+Perlu: **Node 18+**, `curl`, dan Claude Code.
+
+```bash
+git clone https://github.com/Kengkorok/pallet-office.git ~/pallet-office
+cd ~/pallet-office
+node server.js
+```
+
+Buka http://127.0.0.1:4400. Ofis masih kosong sebab belum ada session.
+
+Nak tengok dulu tanpa Claude Code? Buka terminal kedua:
+
+```bash
+node demo.js
+```
+
+## Sambung ke Claude Code
+
+1. Pastikan `hook.sh` boleh dijalankan:
+   ```bash
+   chmod +x ~/pallet-office/hook.sh
+   ```
+2. Buka `~/.claude/settings.json` dan salin blok `"hooks"` dari [`hooks.example.json`](hooks.example.json) ke dalamnya.
+   - Kalau fail tu dah ada blok `"hooks"`, gabungkan setiap event; jangan tulis ganti hook sedia ada.
+   - Kalau repo bukan di `~/pallet-office`, tukar path `$HOME/pallet-office/hook.sh`.
+3. Buka session Claude Code baharu di mana-mana projek. Pokémon dia patut masuk ofis.
+
+Hook ni selamat: `hook.sh` hantar event dengan timeout 1 saat, tak print apa-apa dan sentiasa `exit 0`. Kalau ofis tak jalan, Claude Code langsung tak terasa.
+
+Nak buang? Padam blok `hooks` tu dari `settings.json`.
+
+## Tukar Pokémon
+
+Semua dalam [`config.json`](config.json). Server reload sendiri bila fail ni disimpan, tak perlu restart. Refresh browser je.
+
+```json
+{
+  "projects": [
+    { "name": "PoGo Wave Radar", "match": ["pogo-wave-radar"], "dex": 81, "pokemon": "Magnemite" },
+    { "name": "Home", "exact": ["/home/korok"], "dex": 143, "pokemon": "Snorlax" }
+  ],
+  "fallback": [ { "dex": 133, "pokemon": "Eevee" } ],
+  "helpers":  [ { "dex": 16, "pokemon": "Pidgey" } ]
+}
+```
+
+| Medan | Maksud |
+| --- | --- |
+| `name` | Nama projek yang tertera bawah Pokémon |
+| `match` | Senarai perkataan; kalau mana-mana ada dalam folder session (`cwd`), projek ni dipilih |
+| `exact` | Path folder yang mesti sama tepat (sesuai untuk folder home) |
+| `dex` | Nombor Pokédex nasional. Ini yang tentukan sprite |
+| `pokemon` | Nama untuk label sahaja |
+| `fallback` | Projek yang tiada dalam senarai dapat salah satu Pokémon ni (sama setiap kali untuk projek yang sama) |
+| `helpers` | Pokémon untuk subagent (helper kecil) |
+
+Projek dibaca dari atas ke bawah; yang pertama padan menang. Jadi letak padanan yang lebih spesifik di atas.
+
+**Cari nombor dex:** cari nama Pokémon di [pokemondb.net/pokedex](https://pokemondb.net/pokedex/national), ambil nombor `#`. Contoh: Pikachu `25`, Lucario `448`, Garchomp `445`, Rayquaza `384`.
+
+**Sprite:** dex 1–649 dapat GIF beranimasi (gaya Black/White). Dex di atas 649 guna gambar statik. Sprite besar (legenda) dikecilkan supaya muat bilik.
+
+## Jalan di server rumah (Docker / CasaOS)
+
+```bash
+cp .env.example .env      # isi TAILSCALE_IP, dapat dari: tailscale ip -4
+docker compose up -d --build
+```
+
+Port dibuka di `127.0.0.1` (untuk hook) dan IP Tailscale sahaja, bukan LAN atau internet. Buka `http://<tailscale-ip>:4400` dari phone atau laptop dalam tailnet. `config.json` dipasang read-only, jadi edit fail dalam folder repo.
+
+Kalau Claude Code jalan di **mesin lain**, set dalam env Claude Code:
+
+```bash
+export PALLET_URL=http://<tailscale-ip>:4400
+```
+
+Nak kunci sikit? Isi `PALLET_TOKEN` dalam `.env` dan set `PALLET_TOKEN` yang sama dalam env Claude Code.
+
+## Rakam dan replay
+
+- Tekan **⏺ Rakam** di ofis (atau jalan `RECORD=1 node server.js`). Event disimpan ke `recordings/*.ndjson`. Yang disimpan cuma state yang dah ditapis, bukan prompt atau isi fail.
+- Buka `/replay.html` untuk main balik.
+- Rakaman demo siap: `replay.html?src=recordings/demo.ndjson&autoplay=1&loop=1`.
+
+Nak rakam demo baru tanpa campur session sebenar, guna server berasingan:
+
+```bash
+PORT=4402 RECORD=1 node server.js
+node demo.js http://127.0.0.1:4402
+```
+
+**Letak demo dalam website statik** (macam GitHub Pages): salin `public/office.js`, `public/office.css`, `public/replay.html`, `public/replay.js` dan satu fail `.ndjson`, kemudian buka `replay.html?src=demo.ndjson&autoplay=1&loop=1`. Kalau guna rakaman sebenar, semak dulu nama projek dan fail dalamnya.
+
+## Macam mana ia berfungsi
 
 ```
 Claude Code hook ─► hook.sh ─► POST /event ─► server.js ─► SSE /stream ─► public/ (canvas)
 ```
-
-- `server.js`: Node tanpa dependency. Simpan session dalam memori, tukar hook event jadi state, stream ke browser. Prompt, isi fail dan command penuh dibuang terus; yang keluar cuma label pendek (nama fail, `description` Bash, hostname).
-- `hook.sh`: hantar JSON hook dengan `curl -m 1`, sentiasa `exit 0` dan tak print apa-apa, jadi Claude Code tak pernah tersekat walaupun ofis mati.
-- `config.json`: projek → Pokémon. `match` = substring dalam `cwd`, `exact` = path tepat. Projek lain dapat Pokémon dari `fallback`, subagent dari `helpers`. Server reload sendiri bila fail ni berubah.
 
 | Event | State | Tempat |
 | --- | --- | --- |
@@ -28,32 +122,25 @@ Claude Code hook ─► hook.sh ─► POST /event ─► server.js ─► SSE /
 | SubagentStop | helper balik | |
 | SessionEnd | keluar | pintu |
 
-## Jalan terus (tanpa Docker)
+Prompt, isi fail dan command penuh dibuang terus di server. Yang sampai ke browser cuma label pendek: nama fail, `description` Bash atau hostname.
 
-```bash
-node server.js            # http://127.0.0.1:4400
-node demo.js              # session olok-olok untuk test
-```
+### Env server
 
-Env: `HOST` (default `127.0.0.1`), `PORT` (`4400`), `RECORD=1` (rakam dari mula), `PALLET_TOKEN` (optional, hook.sh kena guna token sama), `DEBUG=1`.
+| Env | Default | Guna |
+| --- | --- | --- |
+| `HOST` | `127.0.0.1` | Alamat server |
+| `PORT` | `4400` | Port |
+| `RECORD` | kosong | `1` = rakam dari mula |
+| `PALLET_TOKEN` | kosong | Token rahsia; `hook.sh` kena guna yang sama |
+| `CONFIG` | `config.json` | Path config lain |
+| `DEBUG` | kosong | `1` = log setiap event |
 
-## CasaOS / Docker (Tailscale sahaja)
+## Masalah biasa
 
-```bash
-cp .env.example .env      # isi TAILSCALE_IP dari: tailscale ip -4
-docker compose up -d --build
-```
+- **Pokémon tak masuk:** pastikan `node server.js` jalan, `hook.sh` boleh dijalankan, dan session Claude Code dibuka *selepas* hooks ditambah. Cuba `DEBUG=1 node server.js` untuk tengok event masuk.
+- **Sprite kosong:** browser perlu internet untuk muat sprite dari `raw.githubusercontent.com`.
+- **Container gagal start lepas reboot:** Tailscale lambat naik. Jalan `docker compose up -d` sekali lagi.
 
-Port dibuka di `127.0.0.1` (untuk hook) dan IP Tailscale sahaja, bukan LAN. Buka `http://<tailscale-ip>:4400` dari phone/laptop dalam tailnet. Kalau container gagal start lepas reboot sebab Tailscale lambat naik, `docker compose up -d` sekali lagi.
+## Kredit
 
-## Hook Claude Code
-
-Salin blok `hooks` dalam `hooks.example.json` ke `~/.claude/settings.json`. Kalau ofis jalan di mesin lain, set `PALLET_URL=http://<ip>:4400` dalam env Claude Code.
-
-## Rakam & replay
-
-Tekan **⏺ Rakam** (atau `RECORD=1`). Event disimpan ke `recordings/*.ndjson` (state yang dah ditapis, bukan JSON hook mentah). Buka `replay.html` untuk main balik.
-
-Ada satu rakaman siap: `recordings/demo.ndjson` (hari olok-olok: Portfolio, Masjid MTU, PoGo Wave Radar, Buku Mewarna, Ship Dashboard dengan Rayquaza, Pallet Office dan Snorlax lepak). Buka `replay.html?src=recordings/demo.ndjson&autoplay=1&loop=1`. Nak rakam semula tanpa campur session sebenar, guna server berasingan: `PORT=4402 RECORD=1 node server.js` kemudian `node demo.js http://127.0.0.1:4402`.
-
-Untuk demo statik di portfolio: salin `public/office.js`, `public/office.css`, `public/replay.html`, `public/replay.js` dan satu rakaman, kemudian buka `replay.html?src=demo.ndjson&autoplay=1&loop=1`. Rakaman `node demo.js` paling selamat sebab tiada data sebenar. Kalau guna rakaman sebenar, semak dulu nama projek/fail dalam tu.
+Sprite dari [PokeAPI/sprites](https://github.com/PokeAPI/sprites). Pokémon © Nintendo / Game Freak / The Pokémon Company. Ini projek hobi, bukan rasmi dan tiada kaitan dengan mereka.
