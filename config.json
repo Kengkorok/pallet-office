@@ -4,7 +4,9 @@
     { "name": "Masjid MTU", "match": ["masjidMTU", "mtu-4.3c"], "dex": 334, "pokemon": "Altaria" },
     { "name": "PoGo Wave Radar", "match": ["pogo-wave-radar"], "dex": 81, "pokemon": "Magnemite" },
     { "name": "Pallet Office", "match": ["pallet-office"], "dex": 132, "pokemon": "Ditto" },
-    { "name": "Home", "exact": ["/home/safibnrahman"], "dex": 143, "pokemon": "Snorlax" }
+    { "name": "Ship Dashboard", "match": ["ship-dashboard"], "dex": 384, "pokemon": "Rayquaza" },
+    { "name": "Buku Mewarna", "match": ["coloring-book"], "dex": 235, "pokemon": "Smeargle" },
+    { "name": "Home", "exact": ["/home/safibnrahman", "/home/demo"], "dex": 143, "pokemon": "Snorlax" }
   ],
   "fallback": [
     { "dex": 133, "pokemon": "Eevee" },

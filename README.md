@@ -54,4 +54,6 @@ Salin blok `hooks` dalam `hooks.example.json` ke `~/.claude/settings.json`. Kala
 
 Tekan **⏺ Rakam** (atau `RECORD=1`). Event disimpan ke `recordings/*.ndjson` (state yang dah ditapis, bukan JSON hook mentah). Buka `replay.html` untuk main balik.
 
+Ada satu rakaman siap: `recordings/demo.ndjson` (hari olok-olok: Portfolio, Masjid MTU, PoGo Wave Radar, Buku Mewarna, Ship Dashboard dengan Rayquaza, Pallet Office dan Snorlax lepak). Buka `replay.html?src=recordings/demo.ndjson&autoplay=1&loop=1`. Nak rakam semula tanpa campur session sebenar, guna server berasingan: `PORT=4402 RECORD=1 node server.js` kemudian `node demo.js http://127.0.0.1:4402`.
+
 Untuk demo statik di portfolio: salin `public/office.js`, `public/office.css`, `public/replay.html`, `public/replay.js` dan satu rakaman, kemudian buka `replay.html?src=demo.ndjson&autoplay=1&loop=1`. Rakaman `node demo.js` paling selamat sebab tiada data sebenar. Kalau guna rakaman sebenar, semak dulu nama projek/fail dalam tu.

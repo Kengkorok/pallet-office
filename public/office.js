@@ -23,7 +23,7 @@
   const DESKS = ROW_TOPS.flatMap((top) => COLS.map((x) => ({ x: x + 16, y: top + 14, aisle: top - 34, top, deskX: x })));
   const CENTER = [225, 275].flatMap((y) => [610, 680, 750, 820, 890].map((x) => ({ x, y, aisle: y })));
   const LOUNGE = [
-    { x: 625, y: 368, aisle: 400 }, { x: 680, y: 368, aisle: 400 }, { x: 735, y: 368, aisle: 400 },
+    { x: 612, y: 368, aisle: 400 }, { x: 680, y: 368, aisle: 400 }, { x: 748, y: 368, aisle: 400 },
     { x: 645, y: 495, aisle: 495 }, { x: 835, y: 495, aisle: 495 }, { x: 885, y: 425, aisle: 425 },
     { x: 600, y: 565, aisle: 565 }, { x: 730, y: 570, aisle: 570 }, { x: 860, y: 565, aisle: 565 },
   ];
@@ -180,8 +180,12 @@
       this.img.className = 'sprite';
       this.img.alt = label;
       this.img.referrerPolicy = 'no-referrer';
-      const scale = helper ? 1 : 1.4;
-      this.img.onload = () => { this.img.style.width = `${this.img.naturalWidth * scale}px`; };
+      // Grow small sprites, but keep legendaries from swallowing the room.
+      const [maxScale, maxHeight] = helper ? [1, 52] : [1.4, 84];
+      this.img.onload = () => {
+        const scale = Math.min(maxScale, maxHeight / this.img.naturalHeight);
+        this.img.style.width = `${Math.round(this.img.naturalWidth * scale)}px`;
+      };
       this.img.onerror = () => { this.img.onerror = null; this.img.src = still(dex); };
       this.img.src = animated(dex);
       const shadow = document.createElement('div');
@@ -237,7 +241,7 @@
     }
 
     tick(dt, t) {
-      let budget = 170 * dt;
+      let budget = 220 * dt;
       while (budget > 0 && this.path.length) {
         const p = this.path[0];
         const dx = p.x - this.x;
