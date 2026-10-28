@@ -9,10 +9,22 @@
   const MAX_GAP = 4000; // squash long quiet stretches so demos keep moving
   const LOOP = params.get('loop') !== '0';
 
+  // Recording wall-clock time: the latest timestamp seen plus playback time since then.
+  let wall = 0;
+  let wallAt = 0;
+  const wallClock = () => (wall ? wall + (performance.now() - wallAt) * Number($('speed').value) : Date.now());
   const office = PalletOffice.createOffice($('office'), {
     feed: $('feed'),
     team: { list: $('team'), summary: $('team-summary') },
+    clock: wallClock,
   });
+  function seen(msg) {
+    const times = [msg.item && msg.item.t, msg.session && msg.session.changedAt, ...(msg.feed || []).map((f) => f.t)].filter(Boolean);
+    if (times.length) {
+      wall = Math.max(wall, ...times);
+      wallAt = performance.now();
+    }
+  }
   let frames = [];
   let i = 0;
   let clock = 0;
@@ -36,6 +48,7 @@
   }
 
   function rewind() {
+    wall = 0;
     i = 0;
     clock = 0;
     showPos();
@@ -48,6 +61,7 @@
   // On a loop, the opening snapshot becomes ordinary updates so everyone walks back
   // to their place instead of teleporting.
   function play1(msg) {
+    seen(msg);
     if (msg.type === 'snapshot' && started) {
       msg.sessions.forEach((session) => office.apply({ type: 'session', session }));
       return;
@@ -100,7 +114,7 @@
     const src = params.get('src');
     if (src) {
       $('file').hidden = true;
-      $('back').hidden = true;
+      if ($('back')) $('back').hidden = true;
       await load(src);
     } else {
       const res = await fetch('api/recordings').catch(() => null);

@@ -46,9 +46,9 @@
   const PC = [16, 15, 20, 18];
   const WARUNG = [3, 16, 6, 18];
   const WAKAF = [3, 20, 5, 22];
-  const DESK_COLS = [5, 8, 11];
-  const DESK_ROWS = [5, 8, 11];
-  const DESKS = DESK_ROWS.flatMap((r) => DESK_COLS.map((c) => ({ c, r, spot: { x: c + 0.5, y: r - 0.5 } })));
+  // Handed out in this order so the first few Pokémon spread across the room.
+  const DESKS = [[5, 5], [8, 8], [11, 11], [11, 5], [5, 11], [8, 5], [5, 8], [11, 8], [8, 11]]
+    .map(([c, r]) => ({ c, r, spot: { x: c + 0.5, y: r - 0.5 } }));
   const WAIT_SLOTS = [[16, 19], [17, 19], [19, 19], [20, 19], [16, 20], [17, 20], [18, 20], [19, 20], [20, 20], [17, 21], [18, 21]]
     .map(([x, y]) => ({ x: x + 0.5, y: y + 0.5 }));
   const NURSE = { x: 15.5, y: 18.5 };
@@ -588,7 +588,8 @@
   }
 
   // ---------- office ----------
-  function createOffice(root, { feed, team, onStats } = {}) {
+  // `clock` lets a replay show "how long ago" in recording time instead of today's time.
+  function createOffice(root, { feed, team, onStats, clock = Date.now } = {}) {
     root.classList.add('world');
     const stage = document.createElement('div');
     stage.className = 'stage';
@@ -776,7 +777,7 @@
     };
     const ORDER = (d) => (d.state === 'waiting' ? 0 : WORKING.has(d.state) ? 1 : d.live ? 2 : 3);
     function ago(t) {
-      const s = Math.max(0, Math.round((Date.now() - (t || Date.now())) / 1000));
+      const s = Math.max(0, Math.round((clock() - (t || clock())) / 1000));
       return s < 60 ? `${s}s` : s < 3600 ? `${Math.floor(s / 60)}m` : `${Math.floor(s / 3600)}j`;
     }
     function task(d) {
