@@ -21,17 +21,19 @@ const STALE_WORKING_MS = 20 * 60 * 1000; // session crashed mid-task
 const STALE_IDLE_MS = 3 * 60 * 60 * 1000; // forgotten terminal
 const STALE_HELPER_MS = 30 * 60 * 1000;
 
-let config = loadConfig();
-fs.watchFile(CONFIG_PATH, { interval: 2000 }, () => {
-  config = loadConfig();
-  console.log('[config] reloaded');
-});
-
-const sessions = new Map(); // session_id -> session
+const residents = new Map(); // project name -> permanent Pokémon, one per config project
+const sessions = new Map(); // session_id -> resident it drives, or a temporary visitor
 const feed = [];
 const clients = new Set();
 let recording = null; // { file, started, stream }
 let helperSeq = 0;
+let config = loadConfig();
+syncResidents();
+fs.watchFile(CONFIG_PATH, { interval: 2000 }, () => {
+  config = loadConfig();
+  syncResidents();
+  console.log('[config] reloaded');
+});
 
 function loadConfig() {
   try {
@@ -40,6 +42,26 @@ function loadConfig() {
   } catch (err) {
     console.error(`[config] ${CONFIG_PATH}: ${err.message}`);
     return { projects: [], fallback: [{ dex: 133, pokemon: 'Eevee' }], helpers: [{ dex: 16, pokemon: 'Pidgey' }] };
+  }
+}
+
+// Configured projects live on the map all the time; sessions only change what they do.
+function syncResidents() {
+  const names = new Set(config.projects.map((p) => p.name));
+  for (const [name, r] of residents) {
+    if (names.has(name) || r.sid) continue;
+    residents.delete(name);
+    send({ type: 'leave', id: r.id });
+  }
+  for (const p of config.projects) {
+    let r = residents.get(p.name);
+    if (!r) {
+      r = { id: `res:${p.name}`, permanent: true, sid: null, project: p.name, state: 'idle', detail: '',
+        since: Date.now(), changedAt: Date.now(), lastSeen: Date.now(), helpers: [], tools: 0 };
+      residents.set(p.name, r);
+    }
+    Object.assign(r, { dex: p.dex, pokemon: p.pokemon, label: p.pokemon });
+    if (clients.size) changed(r);
   }
 }
 
@@ -113,10 +135,12 @@ const VERB = {
   delegating: (d) => `hantar helper (${d})`,
 };
 
+const level = (s) => 5 + Math.floor(s.tools / 8);
+
 function publicSession(s) {
   return {
-    id: s.id, label: s.label, project: s.project, dex: s.dex, pokemon: s.pokemon,
-    state: s.state, detail: s.detail, since: s.since,
+    id: s.id, label: s.label, project: s.project, dex: s.dex, pokemon: s.pokemon, permanent: !!s.permanent,
+    live: !s.permanent || !!s.sid, lv: level(s), state: s.state, detail: s.detail, since: s.since, changedAt: s.changedAt,
     helpers: s.helpers.map((h) => ({ id: h.id, dex: h.dex, pokemon: h.pokemon, kind: h.kind, state: h.state, detail: h.detail })),
   };
 }
@@ -138,21 +162,38 @@ const changed = (s) => send({ type: 'session', session: publicSession(s) });
 
 function arrive(p) {
   const id = identify(p.cwd);
+  const home = residents.get(id.project);
+  if (home && !home.sid) {
+    Object.assign(home, { sid: p.session_id, since: Date.now(), lastSeen: Date.now() });
+    sessions.set(p.session_id, home);
+    changed(home);
+    pushFeed(home, 'mula kerja');
+    return home;
+  }
+  // A second session on the same project, or a project not in config.json.
   const twins = [...sessions.values()].filter((o) => o.project === id.project).length;
   const s = {
-    id: p.session_id, ...id, label: twins ? `${id.pokemon} #${twins + 1}` : id.pokemon,
-    state: 'idle', detail: '', since: Date.now(), lastSeen: Date.now(), helpers: [],
+    id: p.session_id, sid: p.session_id, ...id, label: twins ? `${id.pokemon} #${twins + 1}` : id.pokemon,
+    state: 'idle', detail: '', since: Date.now(), changedAt: Date.now(), lastSeen: Date.now(), helpers: [], tools: 0,
   };
-  sessions.set(s.id, s);
+  sessions.set(p.session_id, s);
   changed(s);
-  pushFeed(s, `masuk ofis (${s.project})`);
+  pushFeed(s, `datang tolong (${s.project})`);
   return s;
 }
 
 function leave(s, why) {
-  sessions.delete(s.id);
+  sessions.delete(s.sid);
+  if (s.permanent) {
+    s.sid = null;
+    s.helpers = [];
+    setState(s, 'idle', '');
+    changed(s);
+    pushFeed(s, why || 'rehat dulu');
+    return;
+  }
   send({ type: 'leave', id: s.id });
-  pushFeed(s, why || 'balik rumah');
+  pushFeed(s, why || 'balik');
 }
 
 function spawnHelper(s, kind, toolUseId) {
@@ -177,6 +218,7 @@ function helperFor(s, p) {
 }
 
 function setState(target, state, detail = '') {
+  if (target.state !== state) target.changedAt = Date.now();
   target.state = state;
   target.detail = detail;
   target.lastSeen = Date.now();
@@ -187,7 +229,7 @@ function handle(p) {
   if (!ev || !p.session_id) return;
   let s = sessions.get(p.session_id);
   if (ev === 'SessionEnd') {
-    if (s) leave(s, p.reason === 'clear' ? 'clear & keluar' : 'balik rumah');
+    if (s) leave(s, p.reason === 'clear' ? 'clear, rehat dulu' : undefined);
     return;
   }
   if (!s) s = arrive(p);
@@ -208,6 +250,9 @@ function handle(p) {
       setState(who, state, detail);
       if (state === 'delegating' && !helper) spawnHelper(s, detail, p.tool_use_id);
       pushFeed(s, VERB[state](detail), who);
+      const lv = level(s);
+      s.tools++;
+      if (level(s) > lv) pushFeed(s, `naik ke Lv ${level(s)}! 🎉`);
       break;
     }
     case 'PostToolUse':
@@ -254,7 +299,7 @@ setInterval(() => {
   const now = Date.now();
   for (const s of sessions.values()) {
     const limit = WORKING.has(s.state) ? STALE_WORKING_MS : STALE_IDLE_MS;
-    if (now - s.lastSeen > limit) { leave(s, 'senyap lama, dah balik'); continue; }
+    if (now - s.lastSeen > limit) { leave(s, 'senyap lama, rehat dulu'); continue; }
     const before = s.helpers.length;
     s.helpers = s.helpers.filter((h) => now - h.lastSeen < STALE_HELPER_MS);
     if (s.helpers.length !== before) changed(s);
@@ -275,7 +320,8 @@ function stopRecording() {
   recording = null;
 }
 
-const snapshot = () => ({ type: 'snapshot', sessions: [...sessions.values()].map(publicSession), feed });
+const visitors = () => [...sessions.values()].filter((s) => !s.permanent);
+const snapshot = () => ({ type: 'snapshot', sessions: [...residents.values(), ...visitors()].map(publicSession), feed });
 const recordStatus = () => ({ type: 'record', on: !!recording, file: recording && recording.file });
 
 const TYPES = {

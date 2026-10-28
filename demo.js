@@ -7,6 +7,7 @@
 const URL_BASE = process.argv[2] || process.env.PALLET_URL || 'http://127.0.0.1:4400';
 const HOME = '/home/demo';
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const PACE = 1.6; // stretch tool calls so the stroll and the bubbles keep in step
 let toolSeq = 0;
 
 async function post(body) {
@@ -19,11 +20,15 @@ async function post(body) {
 
 function session(id, dir) {
   const cwd = `${HOME}/${dir}`;
-  const ev = (hook_event_name, extra = {}) => post({ hook_event_name, session_id: id, cwd, ...extra });
+  const ev = async (hook_event_name, extra = {}) => {
+    await post({ hook_event_name, session_id: id, cwd, ...extra });
+    // Residents stroll at 2.4 tiles/s; give them time to reach the desk or the centre.
+    if (hook_event_name === 'UserPromptSubmit' || hook_event_name === 'PermissionRequest' || hook_event_name === 'Notification') await sleep(5000);
+  };
   const tool = async (tool_name, tool_input, ms = 1500, extra = {}) => {
     const tool_use_id = `t${++toolSeq}`;
     await ev('PreToolUse', { tool_name, tool_input, tool_use_id, ...extra });
-    await sleep(ms);
+    await sleep(ms * PACE);
     await ev('PostToolUse', { tool_name, tool_use_id, ...extra });
   };
   const ask = async (tool_name, tool_input, waitMs, ms) => {

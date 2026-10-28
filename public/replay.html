@@ -9,30 +9,29 @@
   <link rel="stylesheet" href="office.css">
 </head>
 <body>
-  <header>
+  <div id="office"></div>
+  <div class="topbar">
     <h1>PALLET OFFICE · REPLAY</h1>
-    <span class="live" id="pos">–</span>
-    <div class="tools">
-      <select id="file" aria-label="Rakaman"></select>
-      <select id="speed" aria-label="Laju">
-        <option value="1">1×</option>
-        <option value="2" selected>2×</option>
-        <option value="4">4×</option>
-        <option value="8">8×</option>
-      </select>
-      <button id="play" type="button">▶ Main</button>
-      <button id="restart" type="button">⟲ Ulang</button>
-      <a class="btn" id="back" href="./">← Live</a>
-    </div>
-  </header>
-  <main>
-    <div id="office"></div>
-    <aside>
-      <h2>AKTIVITI</h2>
-      <ul id="feed"></ul>
-    </aside>
-  </main>
-  <footer>Sprite dimuat dari <a href="https://github.com/PokeAPI/sprites">PokeAPI/sprites</a>. Pokémon © Nintendo / Game Freak — projek hobi, bukan rasmi.</footer>
+    <span class="btn" id="pos">–</span>
+    <select id="file" aria-label="Rakaman"></select>
+    <select id="speed" aria-label="Laju">
+      <option value="1" selected>1×</option>
+      <option value="2">2×</option>
+      <option value="4">4×</option>
+    </select>
+    <button id="play" type="button">▶ Main</button>
+    <button id="restart" type="button">⟲ Ulang</button>
+    <button id="full" type="button">⛶ Skrin penuh</button>
+    <a class="btn" id="back" href="./">← Live</a>
+  </div>
+  <section class="panel" id="team-panel">
+    <h2>Team <span id="team-summary"></span></h2>
+    <ul id="team"></ul>
+  </section>
+  <section class="panel" id="feed-panel">
+    <h2>Aktiviti</h2>
+    <ul id="feed"></ul>
+  </section>
   <script src="office.js"></script>
   <script src="replay.js"></script>
 </body>

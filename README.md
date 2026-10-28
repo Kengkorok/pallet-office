@@ -1,6 +1,6 @@
 # Pallet Office
 
-Ofis pixel untuk session Claude Code. Setiap session muncul sebagai Pokémon: masuk ikut pintu, duduk di meja masa bekerja (baca, edit, run, web), pergi ke **Pusat Pokémon** bila perlukan kau, lepak di **Sudut Chill** bila siap, dan keluar bila session tamat. Subagent masuk sebagai helper kecil di sebelah meja tuannya.
+Pulau pixel isometrik untuk session Claude Code. Setiap projek dalam `config.json` ada Pokémon sendiri yang **sentiasa tinggal di pulau**: bila takde kerja dia jalan-jalan (warung, wakaf, jeti, tepi tasik). Bila session projek tu mula, dia jalan ke meja dia di ofis dan bubble tunjuk apa dia buat (baca, edit, run, web). Bila perlukan kau, dia pergi ke plaza **Pusat Pokémon**. Bila session tamat, dia sambung lepak. Subagent muncul sebagai helper kecil di sebelah meja tuannya. Panel **Team** (kiri) dan **Aktiviti** (kanan) tunjuk status semua orang.
 
 **Demo:** https://kengkorok.github.io/pallet-office/ (replay hari kerja olok-olok, bukan data sebenar)
 
@@ -110,7 +110,7 @@ Claude Code hook ─► hook.sh ─► POST /event ─► server.js ─► SSE /
 
 | Event | State | Tempat |
 | --- | --- | --- |
-| SessionStart | idle | masuk, ke Sudut Chill |
+| SessionStart | idle (Standby) | terus jalan-jalan |
 | UserPromptSubmit | thinking | meja |
 | PreToolUse Read/Grep/Glob | reading | meja |
 | PreToolUse Edit/Write | editing | meja |
@@ -118,9 +118,11 @@ Claude Code hook ─► hook.sh ─► POST /event ─► server.js ─► SSE /
 | PreToolUse WebFetch/WebSearch | web | meja |
 | PreToolUse Task/Agent | delegating + helper masuk | meja |
 | PermissionRequest / Notification | waiting | Pusat Pokémon |
-| Stop | done | Sudut Chill |
+| Stop | done | sambung jalan-jalan |
 | SubagentStop | helper balik | |
-| SessionEnd | keluar | pintu |
+| SessionEnd | idle (Rehat) | sambung jalan-jalan, tak keluar pulau |
+
+Session kedua untuk projek yang sama, atau projek yang takde dalam `config.json`, muncul sebagai pelawat sementara (cth. *Dragonite #2*) dan hilang bila session tamat. Pokémon jalan 2.4 tile sesaat.
 
 Prompt, isi fail dan command penuh dibuang terus di server. Yang sampai ke browser cuma label pendek: nama fail, `description` Bash atau hostname.
 

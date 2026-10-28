@@ -10,27 +10,23 @@
   <link rel="stylesheet" href="office.css">
 </head>
 <body>
-  <header>
+  <div id="office"></div>
+  <div class="topbar">
     <h1>PALLET OFFICE</h1>
-    <span class="live" id="live">menyambung…</span>
-    <div class="stats">
-      <span><b id="s-total">0</b> dalam ofis</span>
-      <span><b id="s-working">0</b> tengah kerja</span>
-      <span class="alert"><b id="s-waiting">0</b> perlukan kau</span>
-    </div>
-    <div class="tools">
-      <button id="rec" type="button">⏺ Rakam</button>
-      <a class="btn" href="replay.html">▶ Replay</a>
-    </div>
-  </header>
-  <main>
-    <div id="office"></div>
-    <aside>
-      <h2>AKTIVITI</h2>
-      <ul id="feed"></ul>
-    </aside>
-  </main>
-  <footer>Sprite dimuat dari <a href="https://github.com/PokeAPI/sprites">PokeAPI/sprites</a>. Pokémon © Nintendo / Game Freak — projek hobi, bukan rasmi.</footer>
+    <span class="dot" id="live" title="menyambung…"></span>
+    <button id="rec" type="button">⏺ Rakam</button>
+    <a class="btn" href="replay.html">▶ Replay</a>
+    <button id="sound" type="button" title="Bunyi bila ada yang perlukan kau">🔈 Bunyi</button>
+    <button id="full" type="button">⛶ Skrin penuh</button>
+  </div>
+  <section class="panel" id="team-panel">
+    <h2>Team <span id="team-summary"></span></h2>
+    <ul id="team"></ul>
+  </section>
+  <section class="panel" id="feed-panel">
+    <h2>Aktiviti</h2>
+    <ul id="feed"></ul>
+  </section>
   <script src="office.js"></script>
   <script src="live.js"></script>
 </body>
