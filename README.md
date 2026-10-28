@@ -1,10 +1,10 @@
 # Pallet Office
 
-Pulau pixel isometrik untuk session Claude Code. Setiap projek dalam `config.json` ada Pokémon sendiri yang **sentiasa tinggal di pulau**: bila takde kerja dia jalan-jalan (warung, wakaf, jeti, tepi tasik). Bila session projek tu mula, dia jalan ke meja dia di ofis dan bubble tunjuk apa dia buat (baca, edit, run, web). Bila perlukan kau, dia pergi ke plaza **Pusat Pokémon**. Bila session tamat, dia sambung lepak. Subagent muncul sebagai helper kecil di sebelah meja tuannya. Panel **Team** (kiri) dan **Aktiviti** (kanan) tunjuk status semua orang.
+Pulau pixel isometrik untuk session Claude Code. Setiap projek dalam `config.json` ada Pokémon sendiri yang **sentiasa tinggal di pulau**: bila takde kerja dia jalan-jalan (warung, wakaf, jeti, tepi tasik). Bila session projek tu mula, dia jalan ke meja dia di ofis dan bubble tunjuk apa dia buat (baca, edit, run, web). Bila perlukan kau, dia pergi ke plaza **Pusat Pokémon**. Bila session tamat, dia sambung lepak. Subagent muncul sebagai helper kecil di sebelah meja tuannya, dan lepas siap dia kekal di pulau (satu setiap spesies) sampai dipanggil lagi. Klik mana-mana Pokémon (atau barisnya dalam panel Team) untuk dengar cry dia. Panel **Team** (kiri) dan **Aktiviti** (kanan) tunjuk status semua orang.
 
 **Demo:** https://kengkorok.github.io/pallet-office/ (replay hari kerja olok-olok, bukan data sebenar)
 
-Server Node tanpa dependency dan frontend HTML biasa. Tiada aset Nintendo dalam repo; sprite dimuat masa runtime dari [PokeAPI/sprites](https://github.com/PokeAPI/sprites).
+Server Node tanpa dependency dan frontend HTML biasa. Sprite dimuat masa runtime dari [PokeAPI/sprites](https://github.com/PokeAPI/sprites). Cry ada dalam `public/cries/<nama>.mp3`; Pokémon yang takde fail di situ guna cry dari [Pokémon Showdown](https://play.pokemonshowdown.com/audio/cries/). Replay ada muzik latar perlahan (`public/music/`), tekan **♪ Muzik** untuk tutup.
 
 ## Mula cepat (5 minit)
 
@@ -97,10 +97,12 @@ Nak rakam demo baru tanpa campur session sebenar, guna server berasingan:
 
 ```bash
 PORT=4402 RECORD=1 node server.js
-node demo.js http://127.0.0.1:4402
+node demo.js http://127.0.0.1:4402 180
 ```
 
-**Letak demo dalam website statik** (macam GitHub Pages): salin `public/office.js`, `public/office.css`, `public/replay.html`, `public/replay.js` dan satu fail `.ndjson`, kemudian buka `replay.html?src=demo.ndjson&autoplay=1&loop=1`. Kalau guna rakaman sebenar, semak dulu nama projek dan fail dalamnya.
+Nombor terakhir ialah berapa saat demo berjalan. Semua Pokémon kerja tanpa henti sepanjang masa tu, dengan empat helper (Pidgey, Rattata, Caterpie, Magikarp) yang tak balik-balik.
+
+**Letak demo dalam website statik** (macam GitHub Pages): salin `public/office.js`, `public/office.css`, `public/replay.html`, `public/replay.js`, folder `public/cries/` dan `public/music/`, dan satu fail `.ndjson`, kemudian buka `replay.html?src=demo.ndjson&autoplay=1&loop=1`. Kalau guna rakaman sebenar, semak dulu nama projek dan fail dalamnya.
 
 ## Macam mana ia berfungsi
 
@@ -145,4 +147,4 @@ Prompt, isi fail dan command penuh dibuang terus di server. Yang sampai ke brows
 
 ## Kredit
 
-Sprite dari [PokeAPI/sprites](https://github.com/PokeAPI/sprites). Pokémon © Nintendo / Game Freak / The Pokémon Company. Ini projek hobi, bukan rasmi dan tiada kaitan dengan mereka.
+Sprite dari [PokeAPI/sprites](https://github.com/PokeAPI/sprites), cry dari [Pokémon Showdown](https://play.pokemonshowdown.com/audio/cries/). Pokémon © Nintendo / Game Freak / The Pokémon Company. Ini projek hobi, bukan rasmi dan tiada kaitan dengan mereka.
