@@ -2,7 +2,7 @@
 
 Pulau pixel isometrik untuk session Claude Code. Setiap projek dalam `config.json` ada Pokémon sendiri yang **sentiasa tinggal di pulau**: bila takde kerja dia jalan-jalan (warung, wakaf, jeti, tepi tasik). Bila session projek tu mula, dia jalan ke meja dia di ofis dan bubble tunjuk apa dia buat (baca, edit, run, web). Bila perlukan kau, dia pergi ke plaza **Pusat Pokémon**. Bila session tamat, dia sambung lepak. Subagent muncul sebagai helper kecil di sebelah meja tuannya, dan lepas siap dia kekal di pulau (satu setiap spesies) sampai dipanggil lagi. Klik mana-mana Pokémon (atau barisnya dalam panel Team) untuk dengar cry dia. Panel **Team** (kiri) dan **Aktiviti** (kanan) tunjuk status semua orang.
 
-**Demo:** https://kengkorok.github.io/pallet-office/ (replay hari kerja olok-olok, bukan data sebenar)
+**Demo:** https://kengkorok.github.io/pallet-office/ (hari kerja olok-olok yang dijana terus dalam browser, tanpa henti, bukan data sebenar)
 
 Server Node tanpa dependency dan frontend HTML biasa. Sprite dimuat masa runtime dari [PokeAPI/sprites](https://github.com/PokeAPI/sprites). Cry ada dalam `public/cries/<nama>.mp3`; Pokémon yang takde fail di situ guna cry dari [Pokémon Showdown](https://play.pokemonshowdown.com/audio/cries/). Replay ada muzik latar perlahan (`public/music/`), tekan **♪ Muzik** untuk tutup.
 
@@ -18,7 +18,7 @@ node server.js
 
 Buka http://127.0.0.1:4400. Ofis masih kosong sebab belum ada session.
 
-Nak tengok dulu tanpa Claude Code? Buka terminal kedua:
+Nak tengok dulu tanpa Claude Code? Buka http://127.0.0.1:4400/demo.html (simulator dalam browser), atau hantar event palsu ke server dari terminal kedua:
 
 ```bash
 node demo.js
@@ -102,7 +102,9 @@ node demo.js http://127.0.0.1:4402 180
 
 Nombor terakhir ialah berapa saat demo berjalan. Semua Pokémon kerja tanpa henti sepanjang masa tu, dengan empat helper (Pidgey, Rattata, Caterpie, Magikarp) yang tak balik-balik.
 
-**Letak demo dalam website statik** (macam GitHub Pages): salin `public/office.js`, `public/office.css`, `public/replay.html`, `public/replay.js`, folder `public/cries/` dan `public/music/`, dan satu fail `.ndjson`, kemudian buka `replay.html?src=demo.ndjson&autoplay=1&loop=1`. Kalau guna rakaman sebenar, semak dulu nama projek dan fail dalamnya.
+**Letak demo dalam website statik** (macam GitHub Pages): salin `public/demo.html`, `office.js`, `office.css`, `sim.js`, `music.js`, folder `cries/` dan `music/`. `sim.js` jana kerja palsu terus dalam browser, jadi demo jalan selama-lamanya tanpa server atau fail rakaman. Nak tukar Pokémon atau tugasan demo, edit senarai `CAST` dalam `sim.js`.
+
+Nak main balik rakaman pula, salin `replay.html` dan `replay.js` dengan satu fail `.ndjson`, kemudian buka `replay.html?src=demo.ndjson`. Kalau guna rakaman sebenar, semak dulu nama projek dan fail dalamnya.
 
 ## Macam mana ia berfungsi
 
